@@ -43,17 +43,19 @@ fun init(windowSizeW: Int = WINDOW_SIZE_WIDTH, windowSizeH: Int = WINDOW_SIZE_HE
 private fun drawSine() {
     glPointSize(1.0f)
     glColor3f(1.0f, 0.0f, 0.0f)
+    var curstep: Int = 1
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents()
-        glBegin(GL_POINTS)
-        glClear(GL_COLOR_BUFFER_BIT)
 
+        glClear(GL_COLOR_BUFFER_BIT)
+        glBegin(GL_POINTS)
         var x: Double = 0.0
         while (x < WINDOW_SIZE_WIDTH) {
+            if (x == 0.0) println("Creating sine waving using the fist $curstep terms of the fourier series...")
             //Well I don't even pretend to understand fourier analysis, but I do know how to do a simple sumation
             //And thats all it takes to do this simple fourier series. Lets have at it. First 6 series only...
             var finaly: Double = 0.0
-            for (n in 1..11 step 2) {
+            for (n in 1..curstep step 2) {
                 val rightterm: Double = (n.toDouble() * PI * x)/(WINDOW_SIZE_WIDTH.toDouble()/2.0)
                 val finalval: Double = (1.0/n.toDouble())*sin(rightterm)
                 finaly += finalval
@@ -64,7 +66,8 @@ private fun drawSine() {
         }
         glEnd()
         glfwSwapBuffers(window)
-        Thread.sleep(50)
+        curstep += 2
+        Thread.sleep(2000)
     }
 }
 
