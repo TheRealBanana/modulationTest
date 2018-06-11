@@ -15,9 +15,8 @@ var window: Long = NULL
 
 //WAVE STUFFS
 const val TIME_STEP = 0.001 //how much do we increment our x value each tick. Controls the integrity/continuity of the generated waveform
-// CARRIER WAVE VARS
-const val F_CYCLES: Double = 2.0
-const val F_PHASE_SHIFT_DEGREES: Double = 0.0 //Amount to shift the wave by in degrees (0-360). Negative number shift left, positive to the right.
+const val CYCLES: Double = 2.0
+const val TERM_STEP: Int = 4 //How many additional terms we will evaluate in the fourier series each iteration. NUMBER MUST BE EVEN
 
 fun init(windowSizeW: Int = WINDOW_SIZE_WIDTH, windowSizeH: Int = WINDOW_SIZE_HEIGHT) {
     if ( !glfwInit()) {
@@ -46,34 +45,30 @@ private fun drawSine() {
     var curstep: Int = 1
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents()
-
         glClear(GL_COLOR_BUFFER_BIT)
         glBegin(GL_POINTS)
         var x: Double = 0.0
         while (x < WINDOW_SIZE_WIDTH) {
             if (x == 0.0) println("Creating sine waving using the fist $curstep terms of the fourier series...")
-            //Well I don't even pretend to understand fourier analysis, but I do know how to do a simple sumation
-            //And thats all it takes to do this simple fourier series. Lets have at it. First 6 series only...
             var finaly: Double = 0.0
             for (n in 1..curstep step 2) {
-                val rightterm: Double = (n.toDouble() * PI * x)/(WINDOW_SIZE_WIDTH.toDouble()/2.0)
+                val rightterm: Double = (n.toDouble() * PI * x)/(WINDOW_SIZE_WIDTH.toDouble()/(CYCLES*2))
                 val finalval: Double = (1.0/n.toDouble())*sin(rightterm)
                 finaly += finalval
             }
             glVertex2d(x, finaly)
             x += TIME_STEP
-
         }
         glEnd()
         glfwSwapBuffers(window)
-        curstep += 2
+        curstep += TERM_STEP
         Thread.sleep(2000)
     }
 }
 
 fun main(args: Array<String>) {
     init()
-    println("Generating a square wave using the first 6 series of the Fourier series describing a square wave.")
+    println("Generating a square wave using the Fourier series describing a square wave.")
     drawSine()
 
 }
