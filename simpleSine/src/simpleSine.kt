@@ -10,14 +10,15 @@ import kotlin.math.sin
 //GL STUFFS
 const val WINDOW_SIZE_HEIGHT = 500
 const val WINDOW_SIZE_WIDTH = 500
-const val TIME_STEP = 0.001 //how much do we increment our x value each tick. Controls the integrity/continuity of the generated waveform
 var window: Long = NULL
 
 //WAVE STUFFS
 //Instead of using a frequency in hz, we are counting the number of full cycles visible on the screen
+const val TIME_STEP = 0.001 //how much do we increment our x value each tick. Controls the integrity/continuity of the generated waveform
 const val AMPLITUDE = 2
 const val CYCLES: Double = 10.0
 const val PHASE_SHIFT_DEGREES: Double = 0.0 //Amount to shift the wave by in degrees (0-360). Negative number shift left, positive to the right.
+
 
 
 fun init(windowSizeW: Int = WINDOW_SIZE_WIDTH, windowSizeH: Int = WINDOW_SIZE_HEIGHT) {
