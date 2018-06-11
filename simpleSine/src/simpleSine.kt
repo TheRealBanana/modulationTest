@@ -21,18 +21,22 @@ const val PHASE_SHIFT_DEGREES: Double = 0.0 //Amount to shift the wave by in deg
 
 
 
-fun init(windowSizeW: Int = WINDOW_SIZE_WIDTH, windowSizeH: Int = WINDOW_SIZE_HEIGHT) {
+fun init(s: sineObject, windowSizeW: Int = WINDOW_SIZE_WIDTH, windowSizeH: Int = WINDOW_SIZE_HEIGHT) {
     if ( !glfwInit()) {
         throw Exception("Failed to initialize GLFW.")
     }
     glfwDefaultWindowHints()
     //Do not allow resize
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE)
+    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_FALSE)
     window = glfwCreateWindow(windowSizeW, windowSizeH, "SimpleSine", 0, 0)
     if (window == MemoryUtil.NULL) {
         throw Exception("Failed to initialize window.")
     }
     glfwMakeContextCurrent(window)
+
+    //Key callbacks
+    glfwSetKeyCallback(window, s::glfwKeypressCallback)
 
     // GL configuration comes AFTER we make the window our current context, otherwise errors
     GL.createCapabilities()
@@ -41,32 +45,79 @@ fun init(windowSizeW: Int = WINDOW_SIZE_WIDTH, windowSizeH: Int = WINDOW_SIZE_HE
     GL11.glViewport(0, 0, WINDOW_SIZE_WIDTH, WINDOW_SIZE_HEIGHT)
     glfwShowWindow(window)
 }
+//Gotta go object so we can affect variable with callbacks more easily
+class sineObject {
+    var cycles = CYCLES
+    var timeperiod: Double = WINDOW_SIZE_WIDTH / cycles
+    var carrierfreq: Double = 1.0 / timeperiod
+    var phaseshiftdegrees: Double = PHASE_SHIFT_DEGREES
+    var phaseshift: Double = phaseshiftdegrees * PI / 180.0
+    var amplitude: Double = AMPLITUDE.toDouble()
 
-private fun drawSine() {
-    glPointSize(1.0f)
-    glColor3f(1.0f, 0.0f, 0.0f)
-    while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents()
-        glBegin(GL_POINTS)
-        glClear(GL_COLOR_BUFFER_BIT)
+    private fun updateFreq(amount: Double) {
+        cycles += amount
+        timeperiod = WINDOW_SIZE_WIDTH / cycles
+        carrierfreq = 1.0/timeperiod
+    }
 
-        val timeperiod: Double = WINDOW_SIZE_WIDTH/CYCLES
-        val carrierfreq: Double = 1.0/timeperiod
-        val phaseshift: Double = PHASE_SHIFT_DEGREES * PI/180.0
-        var x: Double = 0.0
-        while (x < WINDOW_SIZE_WIDTH) {
-            val y: Double = AMPLITUDE * sin(2*PI * carrierfreq * x + phaseshift)
-            glVertex2d(x, y)
-            x += TIME_STEP
+    private fun updatePhaseShift(amount: Double) {
+        phaseshiftdegrees += amount
+        phaseshift = phaseshiftdegrees * PI / 180.0
+    }
+
+    private fun updateAmplitude(amount: Double) {
+        amplitude += amount
+        if (amplitude < 0.0) amplitude = 0.0
+    }
+
+    private fun resetAll() {
+        cycles = CYCLES
+        timeperiod = WINDOW_SIZE_WIDTH / cycles
+        carrierfreq = 1.0 / timeperiod
+        phaseshiftdegrees = PHASE_SHIFT_DEGREES
+        phaseshift = phaseshiftdegrees * PI / 180.0
+        amplitude = AMPLITUDE.toDouble()
+    }
+
+    fun glfwKeypressCallback(window: Long, key: Int, scancode: Int, action: Int, mods: Int) {
+        if (action == GLFW_PRESS || action == GLFW_REPEAT)
+            when (key) {
+                GLFW_KEY_UP -> updateAmplitude(0.05)
+                GLFW_KEY_DOWN -> updateAmplitude(-0.05)
+                GLFW_KEY_LEFT -> updatePhaseShift(10.0)
+                GLFW_KEY_RIGHT -> updatePhaseShift(-10.0)
+                GLFW_KEY_KP_ADD -> updateFreq(0.05)
+                GLFW_KEY_KP_SUBTRACT -> updateFreq(-0.05)
+                GLFW_KEY_KP_0 -> resetAll()
+            }
+    }
+
+    fun drawSine() {
+        glPointSize(1.0f)
+        glColor3f(1.0f, 0.0f, 0.0f)
+        while (!glfwWindowShouldClose(window)) {
+            glfwPollEvents()
+            glBegin(GL_POINTS)
+            glClear(GL_COLOR_BUFFER_BIT)
+
+            var x: Double = 0.0
+            while (x < WINDOW_SIZE_WIDTH) {
+                val y: Double = amplitude * sin(2 * PI * carrierfreq * x + phaseshift)
+                glVertex2d(x, y)
+                x += TIME_STEP
+            }
+            glEnd()
+            //glfwSwapBuffers(window)
+            glFlush()
+            glClear(GL_COLOR_BUFFER_BIT) //Fixes weird double rendering issues we were having. Would rather just using single bffering.
+            Thread.sleep(10)
+            glfwPollEvents()
         }
-        glEnd()
-        glfwSwapBuffers(window)
-        Thread.sleep(50)
     }
 }
-
 fun main(args: Array<String>) {
-    init()
+    val s = sineObject()
+    init(s)
     println("Generating simple sine wave")
-    drawSine()
+    s.drawSine()
 }

@@ -16,7 +16,7 @@ var window: Long = NULL
 //WAVE STUFFS
 const val TIME_STEP = 0.001 //how much do we increment our x value each tick. Controls the integrity/continuity of the generated waveform
 const val CYCLES: Double = 2.0
-const val TERM_STEP: Int = 4 //How many additional terms we will evaluate in the fourier series each iteration. NUMBER MUST BE EVEN
+const val TERM_STEP: Int = 1
 
 fun init(windowSizeW: Int = WINDOW_SIZE_WIDTH, windowSizeH: Int = WINDOW_SIZE_HEIGHT) {
     if ( !glfwInit()) {
@@ -42,15 +42,16 @@ fun init(windowSizeW: Int = WINDOW_SIZE_WIDTH, windowSizeH: Int = WINDOW_SIZE_HE
 private fun drawSine() {
     glPointSize(1.0f)
     glColor3f(1.0f, 0.0f, 0.0f)
-    var curstep: Int = 1
+    var curstep = 1
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents()
         glClear(GL_COLOR_BUFFER_BIT)
         glBegin(GL_POINTS)
-        var x: Double = 0.0
+
+        var x = 0.0
         while (x < WINDOW_SIZE_WIDTH) {
             if (x == 0.0) println("Creating sine waving using the fist ${(curstep/2)+1} terms of the fourier series...")
-            var finaly: Double = 0.0
+            var finaly = 0.0
             for (n in 1..curstep step 2) {
                 val rightterm: Double = (n.toDouble() * PI * x)/(WINDOW_SIZE_WIDTH.toDouble()/(CYCLES*2))
                 val finalval: Double = (1.0/n.toDouble())*sin(rightterm)
@@ -61,7 +62,7 @@ private fun drawSine() {
         }
         glEnd()
         glfwSwapBuffers(window)
-        curstep += TERM_STEP
+        curstep += TERM_STEP*2
         Thread.sleep(2000)
     }
 }
