@@ -36,7 +36,7 @@ fun init(windowSizeW: Int = WINDOW_SIZE_WIDTH, windowSizeH: Int = WINDOW_SIZE_HE
     glfwDefaultWindowHints()
     //Do not allow resize
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE)
-    window = glfwCreateWindow(windowSizeW, windowSizeH, "KtSnake", 0, 0)
+    window = glfwCreateWindow(windowSizeW, windowSizeH, "Simple Amplitude Modulated Sine Wave", 0, 0)
     if (window == MemoryUtil.NULL) {
         throw Exception("Failed to initialize window.")
     }
@@ -69,7 +69,8 @@ private fun drawSine() {
 
         while (x < WINDOW_SIZE_WIDTH) {
             /*So the basic formula for a modulated carrier wave is pretty simple
-            Its a straight forward multiplication of Fs(t)*Fc(t) where Fs is the signal function and Fc is the carrier function, with T being time or X in our case.
+            Its a straight forward multiplication of Fs(t)*Fc(t) where Fs is the signal function and Fc is the carrier function, with t being time or X in our case.
+            The value of Fs(t) must be less than 1, otherwise you get modulation artifacts.
             In other words the current amplitude of the signal wave is used to modulate the amplitude of the carrier wave.
             For some reason this still produces artifacts in between cycles. The maths below are exactly as the formulas say they should be so I'm not sure whats going on.
             */
