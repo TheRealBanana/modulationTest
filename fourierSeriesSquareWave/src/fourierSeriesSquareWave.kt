@@ -49,7 +49,7 @@ private fun drawSine() {
         glBegin(GL_POINTS)
         var x: Double = 0.0
         while (x < WINDOW_SIZE_WIDTH) {
-            if (x == 0.0) println("Creating sine waving using the fist $curstep terms of the fourier series...")
+            if (x == 0.0) println("Creating sine waving using the fist ${(curstep/2)+1} terms of the fourier series...")
             var finaly: Double = 0.0
             for (n in 1..curstep step 2) {
                 val rightterm: Double = (n.toDouble() * PI * x)/(WINDOW_SIZE_WIDTH.toDouble()/(CYCLES*2))
