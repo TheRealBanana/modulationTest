@@ -15,7 +15,7 @@ var window: Long = NULL
 
 //WAVE STUFFS
 const val TIME_STEP = 0.001 //how much do we increment our x value each tick. Controls the integrity/continuity of the generated waveform
-const val CYCLES: Double = 2.0
+const val CYCLES: Double = 4.0
 const val TERM_STEP: Int = 1
 
 fun init(windowSizeW: Int = WINDOW_SIZE_WIDTH, windowSizeH: Int = WINDOW_SIZE_HEIGHT) {
@@ -50,26 +50,28 @@ private fun drawSine() {
 
         var x = 0.0
         while (x < WINDOW_SIZE_WIDTH) {
-            if (x == 0.0) println("Creating sine waving using the fist ${(curstep/2)+1} terms of the fourier series...")
+            if (x == 0.0) println("Creating sine waves using the fist $curstep terms of the fourier series...")
             var finaly = 0.0
-            for (n in 1..curstep step 2) {
+            for (n in 1..curstep) {
                 val rightterm: Double = (n.toDouble() * PI * x)/(WINDOW_SIZE_WIDTH.toDouble()/(CYCLES*2))
                 val finalval: Double = (1.0/n.toDouble())*sin(rightterm)
                 finaly += finalval
             }
+            //sawtooth magics
+            finaly = 0.5-(1/PI) * finaly
             glVertex2d(x, 4/PI*finaly)
             x += TIME_STEP
         }
         glEnd()
         glfwSwapBuffers(window)
-        curstep += TERM_STEP*2
-        Thread.sleep(2000)
+        curstep += TERM_STEP
+        Thread.sleep(500)
     }
 }
 
 fun main(args: Array<String>) {
     init()
-    println("Generating a square wave using the Fourier series describing a square wave.")
+    println("Generating a sawtooth wave using the Fourier series describing a sawtooth wave.")
     drawSine()
 
 }
