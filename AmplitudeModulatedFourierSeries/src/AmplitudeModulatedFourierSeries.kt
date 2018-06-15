@@ -39,7 +39,7 @@ fun init(windowSizeW: Int = WINDOW_SIZE_WIDTH, windowSizeH: Int = WINDOW_SIZE_HE
     glfwDefaultWindowHints()
     //Do not allow resize
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE)
-    window = glfwCreateWindow(windowSizeW, windowSizeH, "Simple Amplitude Modulated Sine Wave", 0, 0)
+    window = glfwCreateWindow(windowSizeW, windowSizeH, "Amplitude Modulated Fourier Series Based Signals", 0, 0)
     if (window == MemoryUtil.NULL) {
         throw Exception("Failed to initialize window.")
     }
