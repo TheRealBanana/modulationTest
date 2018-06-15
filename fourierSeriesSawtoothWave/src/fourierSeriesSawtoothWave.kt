@@ -59,7 +59,7 @@ private fun drawSine() {
             }
             //sawtooth magics
             finaly = 0.5-(1/PI) * finaly
-            glVertex2d(x, 4/PI*finaly)
+            glVertex2d(x, finaly)
             x += TIME_STEP
         }
         glEnd()

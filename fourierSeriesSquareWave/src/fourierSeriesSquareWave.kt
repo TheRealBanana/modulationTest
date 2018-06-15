@@ -57,7 +57,8 @@ private fun drawSine() {
                 val finalval: Double = (1.0/n.toDouble())*sin(rightterm)
                 finaly += finalval
             }
-            glVertex2d(x, 4/PI*finaly)
+            finaly *= 4/PI
+            glVertex2d(x, finaly)
             x += TIME_STEP
         }
         glEnd()
