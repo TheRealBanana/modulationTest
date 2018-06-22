@@ -19,7 +19,7 @@ const val TIME_STEP = 0.001 //how much do we increment our x value each tick. Co
 const val C_CYCLES: Double = 50.0
 const val C_PHASE_SHIFT_DEGREES: Double = 0.0 //Amount to shift the wave by in degrees (0-360). Negative number shift left, positive to the right.
 // INPUT SIGNAL WAVE VARS
-//Amplitude is in percent of screen height (0.0 - 1.0), just modify the last number
+//Amplitude is in percent of screen height (0.0 - 1.0)
 const val I_AMPLITUDE_PCT = 0.4
 const val I_CYCLES: Double = 3.0
 const val I_PHASE_SHIFT_DEGREES: Double = 0.0
@@ -29,7 +29,7 @@ const val I_AMPLITUDE = WINDOW_SIZE_HEIGHT * I_AMPLITUDE_PCT
 //Be aware that increasing the modulation depth may require a decrease in the input signal amplitude otherwise you will get clipping at the top and bottom of the window.
 const val MODULATION_DEPTH: Double = 1.0
 //FOURIER SERIES STUFFS
-const val MAX_FOURIER_ITERS: Int = 20 //Number of iterations we run each fourier series. Higher numbers produce more accurate results to a point.
+const val MAX_FOURIER_ITERS: Int = 20 //Number of iterations we run each fourier series. Higher numbers produce more accurate results up to a point.
 const val L: Double = WINDOW_SIZE_WIDTH.toDouble()/(I_CYCLES*2)
 
 fun init(windowSizeW: Int = WINDOW_SIZE_WIDTH, windowSizeH: Int = WINDOW_SIZE_HEIGHT) {
@@ -115,10 +115,10 @@ private fun drawSine(mode: Int, modulate: Boolean = true) {
             //Which signal should we modulate?
             var signalamplitude: Double = when(mode) {
                 1 -> {
-                    var fs = fourierSquare(x)
+                    val fs = fourierSquare(x)
                     //Getting rid of the lower half of our square wave otherwise the result is just ugly.
-                    if (fs < 0.0) fs = 0.0
-                    fs
+                    if (fs < 0.0) 0.0
+                    else fs
                 }
                 2 -> fourierSawtooth(x)
                 3 -> fourierTriangle(x)
@@ -151,7 +151,7 @@ private fun drawSine(mode: Int, modulate: Boolean = true) {
 fun main(args: Array<String>) {
     init()
     println("Producing modulated carrier wave...")
-    drawSine(2, modulate=true)
+    drawSine(1, modulate=true)
     /*
     drawSine(0) = normal sine wave,
     drawSine(1) = Square wave
