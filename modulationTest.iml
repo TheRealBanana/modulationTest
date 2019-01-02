@@ -8,5 +8,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
+    <orderEntry type="library" name="lwjgl-3.2" level="application" />
+    <orderEntry type="library" name="commons-math3-3.6.1-javadoc" level="application" />
   </component>
 </module>
