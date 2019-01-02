@@ -39,7 +39,6 @@ var L: Double = WINDOW_SIZE_WIDTH.toDouble()/(I_CYCLES*2)
 //Semi-circle Stuffs:
 var TRUEBESSEL = false
 var TRUEBESSELITERS = 50
-var STEP: Double = 0.001
 //General stuff
 var MODULATE = false
 var WAVEMODE = 0
@@ -150,56 +149,65 @@ fun drawSine() {
     val signalphaseshift = I_PHASE_SHIFT_DEGREES * PI/180.0
 
 
+    var semicirclecorrection = 1.0
+    var loopendpoint = WINDOW_SIZE_WIDTH+OTHERPHASESHIFT
+    var timestep = TIME_STEP
+
     //Semi-circle has special requirements
-    if (WAVEMODE > 3) {
-        println("SEMICIRCLE")
-        while (x < 10.0+OTHERPHASESHIFT) {
-            val y = fourierSemiCircle(x)
-            glVertex2d(x, y)
-            x += STEP
-        }
+    if (WAVEMODE == 4) {
+        loopendpoint = L*2.0
+        semicirclecorrection = (WINDOW_SIZE_WIDTH+OTHERPHASESHIFT)/loopendpoint
+        //Need the extra resolution when modulating this one
+        if (MODULATE) timestep = TIME_STEP/semicirclecorrection
     }
-    else {
-        while (x < WINDOW_SIZE_WIDTH+OTHERPHASESHIFT) {
-            /*
-        So the basic formula for a modulated carrier wave is pretty simple
-        Its a straight forward multiplication of Fs(t)*Fc(t) where Fs is the signal function and Fc is the carrier function, with t being time or X in our case.
-        The value of Fs(t) must be less than 1, otherwise you get modulation artifacts.
-        In other words the current amplitude of the signal wave is used to modulate the amplitude of the carrier wave.
-        For some reason this still produces artifacts in between cycles. The maths below are exactly as the formulas say they should be so I'm not sure whats going on.
-        */
-            val moddepth = WINDOW_SIZE_HEIGHT - (MODULATION_DEPTH * WINDOW_SIZE_HEIGHT)
-            //Which signal should we modulate?
-            var signalamplitude: Double = when (WAVEMODE) {
-                1 -> {
-                    val fs = fourierSquare(x)
-                    //Getting rid of the lower half of our square wave otherwise the result is just ugly.
-                    if (fs < 0.0) 0.0
-                    else fs
-                }
-                2 -> fourierSawtooth(x)
-                3 -> fourierTriangle(x)
-                else -> sin(2 * PI * signalfreq * x + signalphaseshift)
+
+    while (x < loopendpoint) {
+        /*
+    So the basic formula for a modulated carrier wave is pretty simple
+    Its a straight forward multiplication of Fs(t)*Fc(t) where Fs is the signal function and Fc is the carrier function, with t being time or X in our case.
+    The value of Fs(t) must be less than 1, otherwise you get modulation artifacts.
+    In other words the current amplitude of the signal wave is used to modulate the amplitude of the carrier wave.
+    For some reason this still produces artifacts in between cycles. The maths below are exactly as the formulas say they should be so I'm not sure whats going on.
+    */
+
+        val moddepth = WINDOW_SIZE_HEIGHT - (MODULATION_DEPTH * WINDOW_SIZE_HEIGHT)
+        //Which signal should we modulate?
+        var signalamplitude: Double = when (WAVEMODE) {
+            1 -> {
+                val fs = fourierSquare(x)
+                //Getting rid of the lower half of our square wave otherwise the result is just ugly.
+                if (fs < 0.0) 0.0
+                else fs
             }
-            signalamplitude *= WINDOW_SIZE_HEIGHT * I_AMPLITUDE_PCT
-
-            //So all the math Ive read says talks about the definition of the modulation index but now how to affect it
-            //This is the best I've come up with. Actually its all I've come up with lol.
-            if (signalamplitude < 0)
-                signalamplitude -= moddepth
-            else
-                signalamplitude += moddepth
-
-            //Now modulate our chosen signal with our carrier wave.
-            val y: Double = when (MODULATE) {
-                true -> signalamplitude * sin(2 * PI * carrierfreq * x + carrierphaseshift)
-                false -> signalamplitude
-            }
-            glVertex2d(x, y)
-            x += TIME_STEP
-
+            2 -> fourierSawtooth(x)
+            3 -> fourierTriangle(x)
+            4, 5 -> fourierSemiCircle(x)
+            else -> sin(2 * PI * signalfreq * x + signalphaseshift)
         }
+        //Dont need to amplify our semicircle
+        if (WAVEMODE != 4) signalamplitude *= WINDOW_SIZE_HEIGHT * I_AMPLITUDE_PCT
+
+        //So all the math Ive read says talks about the definition of the modulation index but now how to affect it
+        //This is the best I've come up with. Actually its all I've come up with lol.
+        if (signalamplitude < 0)
+            signalamplitude -= moddepth
+        else
+            signalamplitude += moddepth
+
+        //Now modulate our chosen signal with our carrier wave.
+        val y: Double = when (MODULATE) {
+            true -> signalamplitude * sin(2 * PI * carrierfreq * semicirclecorrection * x + carrierphaseshift)
+            false -> signalamplitude
+        }
+
+        //color right half green
+        //if (x > loopendpoint/2) glColor3f(0.0f, 1.0f, 0.0f)
+
+        glVertex2d(x, y)
+        x += timestep
+
     }
+
     glEnd()
     glfwSwapBuffers(window)
 }
@@ -226,10 +234,7 @@ fun glfwKeypressCallback(window: Long, key: Int, scancode: Int, action: Int, mod
             GLFW_KEY_KP_4 -> I_PHASE_SHIFT_DEGREES += 1.0
             GLFW_KEY_KP_6 -> I_PHASE_SHIFT_DEGREES -= 1.0
             GLFW_KEY_KP_ADD -> I_AMPLITUDE_PCT += 0.01
-            GLFW_KEY_KP_SUBTRACT -> {
-                I_AMPLITUDE_PCT -= 0.01
-                if (I_AMPLITUDE_PCT < 0) I_AMPLITUDE_PCT = 0.0
-            }
+            GLFW_KEY_KP_SUBTRACT -> I_AMPLITUDE_PCT -= 0.01
             //General Shortcuts
             GLFW_KEY_1 -> WAVEMODE = 0 // Sine wave
             GLFW_KEY_2 -> WAVEMODE = 1 // Square Wave
