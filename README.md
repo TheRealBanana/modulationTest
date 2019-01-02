@@ -25,29 +25,29 @@ My naive bessel-J implementation (just straight computing the summation) is only
 
 Keyboard shortcuts:
 
-Carrier Wave Shortcuts:
-Up arrow - Increase carrier wave frequency
-Down arrow - Decrease carrier wave frequency
-Left arrow - Shift phase of wave left by 10 degrees
-Right arrow - Shift phase of wave right by 10 degrees
+Carrier Wave Shortcuts:  
+Up arrow - Increase carrier wave frequency  
+Down arrow - Decrease carrier wave frequency  
+Left arrow - Shift phase of wave left by 10 degrees  
+Right arrow - Shift phase of wave right by 10 degrees  
 
-Input Signal Wave Shortcuts:
-1 - Sine Wave
-2 - Square Wave
-3 - Sawtooth Wave
-4 - Triangle Wave
-5 - Semi-circle (With my own BesselJ function)
-6 - Semi-circle (With a real BesselJ function)
-Numpad 8 - Increase input signal wave frequency
-Numpad 2 - Decrease input signal wave frequency
-Numpad 4 - Shift phase of input signal wave left 1 degree
-Numpad 6 - Shift phase of input signal wave right 1 degree
-Numpad Plus - Increase input signal wave amplitude by 1 percent.
-Numpad Minus - Decrease input signal wave amplitude by 1 percent.
+Input Signal Wave Shortcuts:  
+1 - Sine Wave  
+2 - Square Wave  
+3 - Sawtooth Wave  
+4 - Triangle Wave  
+5 - Semi-circle (With my own BesselJ function)  
+6 - Semi-circle (With a real BesselJ function)  
+Numpad 8 - Increase input signal wave frequency  
+Numpad 2 - Decrease input signal wave frequency  
+Numpad 4 - Shift phase of input signal wave left 1 degree  
+Numpad 6 - Shift phase of input signal wave right 1 degree  
+Numpad Plus - Increase input signal wave amplitude by 1 percent.  
+Numpad Minus - Decrease input signal wave amplitude by 1 percent.  
 
-Other Shortcuts:
-M - Enable/Disable amplitude modulation.
-[ - Decrease modulation depth
-] - Increase modulation depth
-Minus - Decrease the number of iterations run for fourier-series based signals.
-Plus - Increase the number of iterations run for fourier-series based signals.
+Other Shortcuts:  
+M - Enable/Disable amplitude modulation.  
+[ - Decrease modulation depth  
+] - Increase modulation depth  
+Minus - Decrease the number of iterations run for fourier-series based signals.  
+Plus - Increase the number of iterations run for fourier-series based signals.  
