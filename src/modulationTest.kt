@@ -43,6 +43,8 @@ var STEP: Double = 0.001
 //General stuff
 var MODULATE = false
 var WAVEMODE = 0
+//Couldnt figure out a better way to handle phase-shifting our fourier series based signals.
+var OTHERPHASESHIFT = 0.0
 /*
 WAVEMODE 0 = normal sine wave
 WAVEMODE 1 = Square wave
@@ -139,7 +141,7 @@ fun drawSine() {
     glColor3f(1.0f, 0.0f, 0.0f)
     glBegin(GL_POINTS)
 
-    var x = 0.0
+    var x = 0.0+OTHERPHASESHIFT
     //carrier wave stuffs
     val carrierfreq = 1.0/(WINDOW_SIZE_WIDTH/C_CYCLES)
     val carrierphaseshift = C_PHASE_SHIFT_DEGREES * PI/180.0
@@ -151,14 +153,14 @@ fun drawSine() {
     //Semi-circle has special requirements
     if (WAVEMODE > 3) {
         println("SEMICIRCLE")
-        while (x < 10.0) {
+        while (x < 10.0+OTHERPHASESHIFT) {
             val y = fourierSemiCircle(x)
             glVertex2d(x, y)
             x += STEP
         }
     }
     else {
-        while (x < WINDOW_SIZE_WIDTH) {
+        while (x < WINDOW_SIZE_WIDTH+OTHERPHASESHIFT) {
             /*
         So the basic formula for a modulated carrier wave is pretty simple
         Its a straight forward multiplication of Fs(t)*Fc(t) where Fs is the signal function and Fc is the carrier function, with t being time or X in our case.
@@ -263,6 +265,11 @@ fun glfwKeypressCallback(window: Long, key: Int, scancode: Int, action: Int, mod
 
 fun setOrthoMode(mode: Int) {
     glLoadIdentity()
+    //Best way I could find to phaseshift our fourier-series based signals
+    OTHERPHASESHIFT = when {
+        WAVEMODE > 0 -> I_PHASE_SHIFT_DEGREES
+        else -> 0.0
+    }
     when (mode) {
         1 -> {
             L = 2.0
@@ -275,11 +282,10 @@ fun setOrthoMode(mode: Int) {
             GL11.glOrtho(0.0, L*2, b, t, -1.0, 1.0)
         }
         else -> {
-            L = WINDOW_SIZE_WIDTH.toDouble()/(I_CYCLES*2)
-            GL11.glOrtho(0.0, WINDOW_SIZE_WIDTH.toDouble(), -WINDOW_SIZE_HEIGHT.toDouble(), WINDOW_SIZE_HEIGHT.toDouble(), -1.0, 1.0)
+            L = WINDOW_SIZE_WIDTH.toDouble()/(I_CYCLES*2) // This controls the frequency of fourier-series based signals
+            GL11.glOrtho(0.0+OTHERPHASESHIFT, WINDOW_SIZE_WIDTH.toDouble()+OTHERPHASESHIFT, -WINDOW_SIZE_HEIGHT.toDouble(), WINDOW_SIZE_HEIGHT.toDouble(), -1.0, 1.0)
         }
     }
-
 }
 
 fun init(windowSizeW: Int = WINDOW_SIZE_WIDTH, windowSizeH: Int = WINDOW_SIZE_HEIGHT) {
